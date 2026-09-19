@@ -1,11 +1,12 @@
 import "dotenv/config";
 import { createServer } from "node:http";
 import { expressApplication } from "./app/app.js";
+import { envZod } from "./common/utils/envSanitization.js";
 
 (async function main() {
   try {
     const nodeServer = createServer(await expressApplication());
-    const PORT = 8000;
+    const PORT = envZod.PORT ? parseInt(envZod.PORT, 10) : 8000;
 
     nodeServer.listen(PORT, () => {
       console.log(
