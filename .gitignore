@@ -145,3 +145,8 @@ backend/.agents
 backend/.claude/
 backend/.cursor/
 backend/.devin/
+
+# Internal documentation / cookbooks
+Cookbook/
+**/Cookbook/**
+

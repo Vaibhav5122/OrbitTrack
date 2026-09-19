@@ -1,13 +1,13 @@
 import type { Response } from "express";
 
-export interface ApiResponseBody<T = any> {
+export interface ApiResponseBody<T = unknown> {
   success: boolean;
   message: string;
   data: T | null;
 }
 
 export class ApiResponse {
-  static ok<T = any>(
+  static ok<T = unknown>(
     res: Response,
     message: string,
     data: T | null = null,
@@ -18,7 +18,7 @@ export class ApiResponse {
       data,
     });
   }
-  static created<T = any>(
+  static created<T = unknown>(
     res: Response,
     message: string,
     data: T | null = null,

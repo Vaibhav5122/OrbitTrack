@@ -5,6 +5,10 @@ import { globalErrorHandler } from "../common/utils/GlobalErrorHandler.js";
 import { ApiError } from "../common/utils/ApiError.js";
 import { envZod } from "../common/utils/envSanitization.js";
 import { authRoutes } from "./routes/auth.routes.js";
+import { clientRoutes } from "./routes/client.routes.js";
+import { projectRoutes } from "./routes/project.routes.js";
+import { taskRoutes } from "./routes/task.routes.js";
+import { activityRoutes } from "./routes/activity.routes.js";
 
 export async function expressApplication(): Promise<Application> {
   const expressApp = express();
@@ -27,6 +31,10 @@ export async function expressApplication(): Promise<Application> {
 
   // API Routes
   expressApp.use("/api/auth", authRoutes);
+  expressApp.use("/api/clients", clientRoutes);
+  expressApp.use("/api/projects", projectRoutes);
+  expressApp.use("/api/tasks", taskRoutes);
+  expressApp.use("/api/activities", activityRoutes);
 
   // 404 Route handler
   expressApp.use((_req, _res, next) => {

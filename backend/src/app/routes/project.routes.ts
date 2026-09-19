@@ -1,0 +1,44 @@
+import { Router } from "express";
+import { Role } from "@prisma/client";
+import { ProjectController } from "../controllers/project.controller.js";
+import { authenticateJwt } from "../middlewares/auth.middleware.js";
+import { authorizeRoles } from "../middlewares/role.middleware.js";
+import { validateBody } from "../middlewares/validate.middleware.js";
+import {
+  createProjectSchema,
+  updateProjectSchema,
+} from "../validations/project.validation.js";
+
+const projectRouter = Router();
+const projectController = new ProjectController();
+
+projectRouter.use(authenticateJwt);
+
+// Admin and PM can create projects
+projectRouter.post(
+  "/",
+  authorizeRoles(Role.ADMIN, Role.PROJECT_MANAGER),
+  validateBody(createProjectSchema),
+  projectController.handleCreateProject.bind(projectController),
+);
+
+// All roles can list their accessible projects (role scoping in controller)
+projectRouter.get("/", projectController.handleGetProjects.bind(projectController));
+
+projectRouter.get("/:id", projectController.handleGetProjectById.bind(projectController));
+
+// Admin and PM can update/delete projects (PM restricted to owned projects)
+projectRouter.put(
+  "/:id",
+  authorizeRoles(Role.ADMIN, Role.PROJECT_MANAGER),
+  validateBody(updateProjectSchema),
+  projectController.handleUpdateProject.bind(projectController),
+);
+
+projectRouter.delete(
+  "/:id",
+  authorizeRoles(Role.ADMIN, Role.PROJECT_MANAGER),
+  projectController.handleDeleteProject.bind(projectController),
+);
+
+export const projectRoutes: Router = projectRouter;
