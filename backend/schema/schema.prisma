@@ -36,6 +36,7 @@ model User {
   ownedProjects Project[]      @relation("ProjectOwner")
   assignedTasks Task[]         @relation("AssignedTasks")
   activityLogs  ActivityLog[]
+  notifications Notification[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 
@@ -121,8 +122,8 @@ model ActivityLog {
   task        Task?    @relation(fields: [taskId], references: [id], onDelete: SetNull)
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  action      String   // e.g., "STATUS_UPDATED", "TASK_CREATED", "TASK_ASSIGNED", "FLAGGED_OVERDUE"
-  description String   // e.g. "Ravi moved Task #12 from In Progress → In Review"
+  action      String
+  description String
   metadata    Json?
   createdAt   DateTime @default(now())
 
@@ -130,4 +131,19 @@ model ActivityLog {
   @@index([taskId, createdAt])
   @@index([userId])
   @@map("activity_logs")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+  @@map("notifications")
 }

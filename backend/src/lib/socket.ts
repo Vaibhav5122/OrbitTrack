@@ -33,6 +33,16 @@ export interface TaskStatusUpdatedPayload {
   updatedByName: string;
 }
 
+export interface NotificationBroadcastPayload {
+  id: string;
+  userId: string;
+  title: string;
+  message: string;
+  isRead: boolean;
+  link: string | null;
+  createdAt: string;
+}
+
 let io: Server | null = null;
 const userSocketCounts = new Map<string, number>();
 
@@ -194,4 +204,17 @@ export function broadcastTaskStatusUpdate(
   if (assignedToId && assignedToId !== projectOwnerId) {
     io.to(`user:${assignedToId}`).emit("task:status_updated", payload);
   }
+}
+
+export function sendRealtimeNotification(
+  userId: string,
+  notification: NotificationBroadcastPayload,
+  unreadCount: number
+): void {
+  if (!io) return;
+
+  io.to(`user:${userId}`).emit("notification:new", {
+    notification,
+    unreadCount,
+  });
 }

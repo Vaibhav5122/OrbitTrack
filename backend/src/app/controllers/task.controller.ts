@@ -10,6 +10,7 @@ import { prisma } from "../../lib/prisma.js";
 import { ApiError } from "../../common/utils/ApiError.js";
 import { ApiResponse } from "../../common/utils/ApiResponse.js";
 import { broadcastActivityLog, broadcastTaskStatusUpdate } from "../../lib/socket.js";
+import { createAndEmitNotification } from "../utils/notification.util.js";
 
 export function formatStatusLabel(status: TaskStatus): string {
   switch (status) {
@@ -132,6 +133,15 @@ export class TaskController {
       task.project.ownerId,
       task.assignedToId,
     );
+
+    if (task.assignedToId && task.assignedToId !== user.id) {
+      await createAndEmitNotification({
+        userId: task.assignedToId,
+        title: "New Task Assigned",
+        message: `You were assigned to task "${task.title}" in project "${task.project.name}"`,
+        link: `/projects/${task.projectId}?task=${task.id}`,
+      });
+    }
 
     return ApiResponse.created(res, "Task created successfully", task);
   }
@@ -369,6 +379,15 @@ export class TaskController {
       task.assignedToId,
     );
 
+    if (newStatus === TaskStatus.IN_REVIEW && task.project.ownerId !== user.id) {
+      await createAndEmitNotification({
+        userId: task.project.ownerId,
+        title: "Task Submitted for Review",
+        message: `${actorName} moved task "${task.title}" to In Review`,
+        link: `/projects/${task.projectId}?task=${task.id}`,
+      });
+    }
+
     return ApiResponse.ok(res, "Task status updated successfully", updatedTask);
   }
 
@@ -484,6 +503,15 @@ export class TaskController {
         task.project.ownerId,
         updatedTask.assignedToId,
       );
+
+      if (assignedToId && assignedToId !== user.id) {
+        await createAndEmitNotification({
+          userId: assignedToId,
+          title: "Task Reassigned",
+          message: `You were assigned to task "${updatedTask.title}" in project "${updatedTask.project.name}"`,
+          link: `/projects/${task.projectId}?task=${task.id}`,
+        });
+      }
     }
 
     return ApiResponse.ok(res, "Task updated successfully", updatedTask);
