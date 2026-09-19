@@ -3,7 +3,7 @@ import { ApiError } from "./ApiError.js";
 import { ZodError } from "zod";
 
 export const globalErrorHandler = (
-  err: any,
+  err: unknown,
   _req: Request,
   res: Response,
   _next: NextFunction,
@@ -15,14 +15,15 @@ export const globalErrorHandler = (
   } else if (err instanceof ApiError) {
     finalizedError = err;
   } else if (
-    err?.type === "entity.parse.failed" ||
+    (typeof err === "object" &&
+      err !== null &&
+      "type" in err &&
+      (err as { type: string }).type === "entity.parse.failed") ||
     err instanceof SyntaxError
   ) {
     finalizedError = ApiError.badRequest(
       "Invalid or empty JSON payload provided",
     );
-  } else if (err?.code === 11000) {
-    finalizedError = ApiError.emailExists("Email already exists");
   } else {
     finalizedError = ApiError.serverError("Internal server Error");
   }
