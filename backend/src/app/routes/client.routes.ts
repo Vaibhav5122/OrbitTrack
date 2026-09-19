@@ -12,7 +12,6 @@ import {
 const clientRouter = Router();
 const clientController = new ClientController();
 
-// Only Admin and Project Manager can manage clients
 clientRouter.use(authenticateJwt, authorizeRoles(Role.ADMIN, Role.PROJECT_MANAGER));
 
 clientRouter.post(

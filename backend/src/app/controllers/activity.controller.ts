@@ -20,17 +20,14 @@ export class ActivityLogController {
     let whereClause: Record<string, unknown> = {};
 
     if (user.role === Role.ADMIN) {
-      // Admin sees global activity across all projects
       whereClause = {};
     } else if (user.role === Role.PROJECT_MANAGER) {
-      // PM sees activity only from their own projects
       whereClause = {
         project: {
           ownerId: user.id,
         },
       };
     } else if (user.role === Role.DEVELOPER) {
-      // Developer sees activity only on tasks assigned to them
       whereClause = {
         task: {
           assignedToId: user.id,

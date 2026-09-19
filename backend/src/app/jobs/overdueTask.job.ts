@@ -1,6 +1,7 @@
 import cron, { type ScheduledTask } from "node-cron";
 import { TaskStatus } from "@prisma/client";
 import { prisma } from "../../lib/prisma.js";
+import { broadcastActivityLog } from "../../lib/socket.js";
 
 export async function runOverdueTaskCheck(): Promise<number> {
   const now = new Date();
@@ -23,37 +24,57 @@ export async function runOverdueTaskCheck(): Promise<number> {
   }
 
   for (const task of overdueTasks) {
-    await prisma.$transaction(async (tx) => {
-      await tx.task.update({
+    const description = `Task '${task.title}' was automatically flagged as Overdue by system scheduler`;
+
+    const [, activityLog] = await prisma.$transaction([
+      prisma.task.update({
         where: { id: task.id },
         data: { isOverdue: true },
-      });
-
-      await tx.activityLog.create({
+      }),
+      prisma.activityLog.create({
         data: {
           projectId: task.projectId,
           taskId: task.id,
           userId: task.project.ownerId,
           action: "TASK_OVERDUE",
-          description: `Task '${task.title}' was automatically flagged as Overdue by system scheduler`,
+          description,
           metadata: {
             dueDate: task.dueDate.toISOString(),
             status: task.status,
           },
         },
-      });
-    });
-  }
+        include: {
+          user: { select: { id: true, name: true, email: true } },
+          project: { select: { id: true, name: true } },
+          task: { select: { id: true, title: true } },
+        },
+      }),
+    ]);
 
-  console.log(
-    `[OverdueTaskJob] Flagged ${overdueTasks.length} task(s) as Overdue.`,
-  );
+    broadcastActivityLog(
+      {
+        id: activityLog.id,
+        projectId: task.projectId,
+        projectName: task.project.name,
+        taskId: task.id,
+        taskTitle: task.title,
+        userId: activityLog.userId,
+        userName: activityLog.user.name,
+        userEmail: activityLog.user.email,
+        action: activityLog.action,
+        description: activityLog.description,
+        metadata: activityLog.metadata,
+        createdAt: activityLog.createdAt.toISOString(),
+      },
+      task.project.ownerId,
+      task.assignedToId
+    );
+  }
 
   return overdueTasks.length;
 }
 
 export function startOverdueTaskJob(): ScheduledTask {
-  // Run once every minute: "* * * * *"
   const scheduledTask = cron.schedule("* * * * *", async () => {
     try {
       await runOverdueTaskCheck();
@@ -62,6 +83,5 @@ export function startOverdueTaskJob(): ScheduledTask {
     }
   });
 
-  console.log("[OverdueTaskJob] Overdue task background scheduler initialized.");
   return scheduledTask;
 }

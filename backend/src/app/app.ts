@@ -9,6 +9,7 @@ import { clientRoutes } from "./routes/client.routes.js";
 import { projectRoutes } from "./routes/project.routes.js";
 import { taskRoutes } from "./routes/task.routes.js";
 import { activityRoutes } from "./routes/activity.routes.js";
+import { dashboardRoutes } from "./routes/dashboard.routes.js";
 
 export async function expressApplication(): Promise<Application> {
   const expressApp = express();
@@ -35,6 +36,7 @@ export async function expressApplication(): Promise<Application> {
   expressApp.use("/api/projects", projectRoutes);
   expressApp.use("/api/tasks", taskRoutes);
   expressApp.use("/api/activities", activityRoutes);
+  expressApp.use("/api/dashboard", dashboardRoutes);
 
   // 404 Route handler
   expressApp.use((_req, _res, next) => {

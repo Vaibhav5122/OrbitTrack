@@ -15,13 +15,10 @@ const taskController = new TaskController();
 
 taskRouter.use(authenticateJwt);
 
-// List tasks (supports query filtering: status, priority, dueDateFrom, dueDateTo, projectId, isOverdue)
 taskRouter.get("/", taskController.handleGetTasks.bind(taskController));
 
-// Get task by ID
 taskRouter.get("/:id", taskController.handleGetTaskById.bind(taskController));
 
-// Create task inside a project (Admin & PM only)
 taskRouter.post(
   "/project/:projectId",
   authorizeRoles(Role.ADMIN, Role.PROJECT_MANAGER),
@@ -29,14 +26,12 @@ taskRouter.post(
   taskController.handleCreateTask.bind(taskController),
 );
 
-// Update task status (Developer assigned, PM owner, Admin)
 taskRouter.patch(
   "/:id/status",
   validateBody(updateTaskStatusSchema),
   taskController.handleUpdateTaskStatus.bind(taskController),
 );
 
-// Update task details (Admin & PM only)
 taskRouter.patch(
   "/:id",
   authorizeRoles(Role.ADMIN, Role.PROJECT_MANAGER),
@@ -44,7 +39,6 @@ taskRouter.patch(
   taskController.handleUpdateTask.bind(taskController),
 );
 
-// Delete task (Admin & PM only)
 taskRouter.delete(
   "/:id",
   authorizeRoles(Role.ADMIN, Role.PROJECT_MANAGER),

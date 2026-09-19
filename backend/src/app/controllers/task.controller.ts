@@ -9,6 +9,7 @@ import type {
 import { prisma } from "../../lib/prisma.js";
 import { ApiError } from "../../common/utils/ApiError.js";
 import { ApiResponse } from "../../common/utils/ApiResponse.js";
+import { broadcastActivityLog, broadcastTaskStatusUpdate } from "../../lib/socket.js";
 
 export function formatStatusLabel(status: TaskStatus): string {
   switch (status) {
@@ -41,7 +42,6 @@ export class TaskController {
     const { title, description, status, priority, dueDate, assignedToId } =
       req.body;
 
-    // Verify project existence and ownership
     const project = await prisma.project.findUnique({
       where: { id: projectId },
     });
@@ -50,14 +50,12 @@ export class TaskController {
       throw ApiError.notFound("Project not found");
     }
 
-    // PM can only create tasks in their owned projects
     if (user.role === Role.PROJECT_MANAGER && project.ownerId !== user.id) {
       throw ApiError.forbidden(
         "Access denied: You can only create tasks in projects you created",
       );
     }
 
-    // If assigned to a developer, verify developer exists
     if (assignedToId) {
       const assignedUser = await prisma.user.findUnique({
         where: { id: assignedToId },
@@ -70,6 +68,12 @@ export class TaskController {
     const parsedDueDate = new Date(dueDate);
     const isOverdue =
       parsedDueDate < new Date() && status !== TaskStatus.DONE;
+
+    const actor = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { id: true, name: true, email: true },
+    });
+    const actorName = actor?.name ?? "User";
 
     const task = await prisma.task.create({
       data: {
@@ -92,14 +96,7 @@ export class TaskController {
       },
     });
 
-    const actor = await prisma.user.findUnique({
-      where: { id: user.id },
-      select: { name: true },
-    });
-    const actorName = actor?.name ?? "User";
-
-    // Record ActivityLog in database
-    await prisma.activityLog.create({
+    const activityLog = await prisma.activityLog.create({
       data: {
         projectId,
         taskId: task.id,
@@ -112,7 +109,29 @@ export class TaskController {
           assignedTo: task.assignedTo?.name ?? null,
         },
       },
+      include: {
+        user: { select: { id: true, name: true, email: true } },
+      },
     });
+
+    broadcastActivityLog(
+      {
+        id: activityLog.id,
+        projectId,
+        projectName: task.project.name,
+        taskId: task.id,
+        taskTitle: task.title,
+        userId: user.id,
+        userName: actorName,
+        userEmail: actor?.email ?? "",
+        action: activityLog.action,
+        description: activityLog.description,
+        metadata: activityLog.metadata,
+        createdAt: activityLog.createdAt.toISOString(),
+      },
+      task.project.ownerId,
+      task.assignedToId,
+    );
 
     return ApiResponse.created(res, "Task created successfully", task);
   }
@@ -133,7 +152,6 @@ export class TaskController {
       isOverdue,
     } = req.query as TaskQueryFilterSchemaType;
 
-    // Build filter conditions
     const whereConditions: Record<string, unknown> = {};
 
     if (status) {
@@ -155,13 +173,11 @@ export class TaskController {
       whereConditions.dueDate = dateFilter;
     }
 
-    // Role-based scoping
     if (user.role === Role.ADMIN) {
       if (assignedToId) {
         whereConditions.assignedToId = assignedToId;
       }
     } else if (user.role === Role.PROJECT_MANAGER) {
-      // PM can only see tasks inside projects they created
       whereConditions.project = {
         ownerId: user.id,
       };
@@ -169,7 +185,6 @@ export class TaskController {
         whereConditions.assignedToId = assignedToId;
       }
     } else if (user.role === Role.DEVELOPER) {
-      // Developer can strictly only see tasks assigned to them
       whereConditions.assignedToId = user.id;
     }
 
@@ -228,7 +243,6 @@ export class TaskController {
       throw ApiError.notFound("Task not found");
     }
 
-    // Role-based security checks
     if (user.role === Role.PROJECT_MANAGER && task.project.ownerId !== user.id) {
       throw ApiError.forbidden("Access denied: You cannot view tasks in another PM's project");
     }
@@ -267,7 +281,6 @@ export class TaskController {
       throw ApiError.notFound("Task not found");
     }
 
-    // Role authorization check
     if (user.role === Role.PROJECT_MANAGER && task.project.ownerId !== user.id) {
       throw ApiError.forbidden("Access denied: You cannot update tasks in another PM's project");
     }
@@ -304,15 +317,13 @@ export class TaskController {
 
     const actor = await prisma.user.findUnique({
       where: { id: user.id },
-      select: { name: true },
+      select: { id: true, name: true, email: true },
     });
     const actorName = actor?.name ?? "User";
 
-    // Formatted audit message required by hiring assessment:
-    // e.g. "Ravi moved Task #12 from In Progress → In Review"
     const description = `${actorName} moved Task '${task.title}' from ${formatStatusLabel(oldStatus)} → ${formatStatusLabel(newStatus)}`;
 
-    await prisma.activityLog.create({
+    const activityLog = await prisma.activityLog.create({
       data: {
         projectId: task.projectId,
         taskId: task.id,
@@ -325,6 +336,38 @@ export class TaskController {
         },
       },
     });
+
+    broadcastActivityLog(
+      {
+        id: activityLog.id,
+        projectId: task.projectId,
+        projectName: updatedTask.project.name,
+        taskId: task.id,
+        taskTitle: task.title,
+        userId: user.id,
+        userName: actorName,
+        userEmail: actor?.email ?? "",
+        action: activityLog.action,
+        description: activityLog.description,
+        metadata: activityLog.metadata,
+        createdAt: activityLog.createdAt.toISOString(),
+      },
+      task.project.ownerId,
+      task.assignedToId,
+    );
+
+    broadcastTaskStatusUpdate(
+      {
+        taskId: task.id,
+        projectId: task.projectId,
+        status: newStatus,
+        previousStatus: oldStatus,
+        updatedById: user.id,
+        updatedByName: actorName,
+      },
+      task.project.ownerId,
+      task.assignedToId,
+    );
 
     return ApiResponse.ok(res, "Task status updated successfully", updatedTask);
   }
@@ -356,7 +399,6 @@ export class TaskController {
       throw ApiError.notFound("Task not found");
     }
 
-    // Only Admin or project-owning PM can edit task details
     if (user.role === Role.DEVELOPER) {
       throw ApiError.forbidden("Access denied: Developers cannot edit task properties");
     }
@@ -401,6 +443,48 @@ export class TaskController {
         },
       },
     });
+
+    if (assignedToId !== undefined && assignedToId !== task.assignedToId) {
+      const actor = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { id: true, name: true, email: true },
+      });
+      const actorName = actor?.name ?? "User";
+      const newAssignee = updatedTask.assignedTo?.name ?? "Unassigned";
+
+      const log = await prisma.activityLog.create({
+        data: {
+          projectId: task.projectId,
+          taskId: task.id,
+          userId: user.id,
+          action: "TASK_ASSIGNED",
+          description: `${actorName} assigned Task '${updatedTask.title}' to ${newAssignee}`,
+          metadata: {
+            assignedToId: updatedTask.assignedToId,
+            assignedToName: newAssignee,
+          },
+        },
+      });
+
+      broadcastActivityLog(
+        {
+          id: log.id,
+          projectId: task.projectId,
+          projectName: updatedTask.project.name,
+          taskId: task.id,
+          taskTitle: task.title,
+          userId: user.id,
+          userName: actorName,
+          userEmail: actor?.email ?? "",
+          action: log.action,
+          description: log.description,
+          metadata: log.metadata,
+          createdAt: log.createdAt.toISOString(),
+        },
+        task.project.ownerId,
+        updatedTask.assignedToId,
+      );
+    }
 
     return ApiResponse.ok(res, "Task updated successfully", updatedTask);
   }

@@ -14,7 +14,6 @@ const projectController = new ProjectController();
 
 projectRouter.use(authenticateJwt);
 
-// Admin and PM can create projects
 projectRouter.post(
   "/",
   authorizeRoles(Role.ADMIN, Role.PROJECT_MANAGER),
@@ -22,12 +21,10 @@ projectRouter.post(
   projectController.handleCreateProject.bind(projectController),
 );
 
-// All roles can list their accessible projects (role scoping in controller)
 projectRouter.get("/", projectController.handleGetProjects.bind(projectController));
 
 projectRouter.get("/:id", projectController.handleGetProjectById.bind(projectController));
 
-// Admin and PM can update/delete projects (PM restricted to owned projects)
 projectRouter.put(
   "/:id",
   authorizeRoles(Role.ADMIN, Role.PROJECT_MANAGER),

@@ -171,7 +171,6 @@ export class AuthController {
       throw ApiError.unauthorized("Token user mismatch");
     }
 
-    // Token rotation: revoke old token and create new one
     await prisma.refreshToken.update({
       where: { id: savedToken.id },
       data: { revoked: true },

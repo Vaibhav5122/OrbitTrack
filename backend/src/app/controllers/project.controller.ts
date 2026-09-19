@@ -43,7 +43,6 @@ export class ProjectController {
       },
     });
 
-    // Record creation in ActivityLog
     await prisma.activityLog.create({
       data: {
         projectId: project.id,
@@ -67,10 +66,8 @@ export class ProjectController {
     if (user.role === Role.ADMIN) {
       whereClause = {};
     } else if (user.role === Role.PROJECT_MANAGER) {
-      // PM can only manage and see projects they created
       whereClause = { ownerId: user.id };
     } else if (user.role === Role.DEVELOPER) {
-      // Developer can only view projects where they have assigned tasks
       whereClause = {
         tasks: {
           some: { assignedToId: user.id },
@@ -128,7 +125,6 @@ export class ProjectController {
       throw ApiError.notFound("Project not found");
     }
 
-    // Role-based security check
     if (user.role === Role.PROJECT_MANAGER && project.ownerId !== user.id) {
       throw ApiError.forbidden("Access denied: You can only view projects you created");
     }
@@ -162,7 +158,6 @@ export class ProjectController {
       throw ApiError.notFound("Project not found");
     }
 
-    // Strict PM isolation
     if (user.role === Role.PROJECT_MANAGER && project.ownerId !== user.id) {
       throw ApiError.forbidden("Access denied: You cannot edit another PM's project");
     }
@@ -213,7 +208,6 @@ export class ProjectController {
       throw ApiError.notFound("Project not found");
     }
 
-    // Strict PM isolation
     if (user.role === Role.PROJECT_MANAGER && project.ownerId !== user.id) {
       throw ApiError.forbidden("Access denied: You cannot delete another PM's project");
     }
