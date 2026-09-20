@@ -45,7 +45,9 @@ export interface PresenceCountPayload {
 }
 
 const SOCKET_URL =
-  process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:8000";
+  process.env.NEXT_PUBLIC_SOCKET_URL ||
+  process.env.NEXT_PUBLIC_WS_URL ||
+  "http://localhost:8000";
 
 let socketInstance: Socket | null = null;
 

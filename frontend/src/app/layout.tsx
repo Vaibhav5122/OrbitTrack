@@ -27,6 +27,14 @@ import { Toaster } from "@/components/ui/sonner";
 export const metadata: Metadata = {
   title: "OrbitTrack | Real-Time Project Dashboard",
   description: "Real-time client project dashboard with role-based access & live activity feed",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon.jpg", type: "image/jpeg" },
+    ],
+    shortcut: "/icon.svg",
+    apple: "/icon.jpg",
+  },
 };
 
 export default function RootLayout({
