@@ -64,9 +64,15 @@ export function LoginForm({
           <form
             onSubmit={handleSubmit((data) =>
               login(data, {
-                onSuccess: () => {
+                onSuccess: (response) => {
                   reset();
-                  router.push("/");
+                  if (response.user.role === "ADMIN") {
+                    router.push("/dashboard/admin");
+                  } else if (response.user.role === "PROJECT_MANAGER") {
+                    router.push("/dashboard/pm");
+                  } else {
+                    router.push("/dashboard/developer");
+                  }
                 },
               }),
             )}
