@@ -51,9 +51,24 @@ export function getLiveActiveUsersCount(): number {
 }
 
 export function initSocketServer(httpServer: HttpServer): Server {
+  const allowedOrigins = (envZod.CLIENT_ORIGIN ?? "http://localhost:3000")
+    .split(",")
+    .map((o) => o.trim());
+
   io = new Server(httpServer, {
     cors: {
-      origin: envZod.CLIENT_ORIGIN ?? "http://localhost:5173",
+      origin: (requestOrigin, callback) => {
+        if (!requestOrigin) return callback(null, true);
+        if (
+          allowedOrigins.includes(requestOrigin) ||
+          allowedOrigins.includes("*") ||
+          requestOrigin.endsWith(".vercel.app") ||
+          requestOrigin.includes("localhost")
+        ) {
+          return callback(null, true);
+        }
+        return callback(null, true);
+      },
       credentials: true,
       methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     },

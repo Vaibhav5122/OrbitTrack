@@ -8,7 +8,8 @@ const envSchema = z.object({
   JWT_REFRESH_SECRET: z.string().min(16, "JWT_REFRESH_SECRET must be at least 16 characters"),
   ACCESS_TOKEN_EXPIRES_IN: z.string().default("15m"),
   REFRESH_TOKEN_EXPIRES_IN: z.string().default("7d"),
-  CLIENT_ORIGIN: z.string().default("http://localhost:3000"),
+  CLIENT_ORIGIN: z.string().optional(),
+  CLIENT_URL: z.string().optional(),
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 });
 
@@ -17,7 +18,15 @@ function parsedEnvSchema(env: NodeJS.ProcessEnv) {
   if (!parsedEnv.success) {
     throw ApiError.fromZod(parsedEnv.error);
   }
-  return parsedEnv.data;
+  const clientOrigin =
+    parsedEnv.data.CLIENT_ORIGIN ||
+    parsedEnv.data.CLIENT_URL ||
+    "http://localhost:3000";
+
+  return {
+    ...parsedEnv.data,
+    CLIENT_ORIGIN: clientOrigin,
+  };
 }
 
 export const envZod = parsedEnvSchema(process.env);

@@ -15,9 +15,24 @@ import { notificationRoutes } from "./routes/notification.routes.js";
 export async function expressApplication(): Promise<Application> {
   const expressApp = express();
 
+  const allowedOrigins = (envZod.CLIENT_ORIGIN ?? "http://localhost:3000")
+    .split(",")
+    .map((o) => o.trim());
+
   expressApp.use(
     cors({
-      origin: envZod.CLIENT_ORIGIN,
+      origin: (requestOrigin, callback) => {
+        if (!requestOrigin) return callback(null, true);
+        if (
+          allowedOrigins.includes(requestOrigin) ||
+          allowedOrigins.includes("*") ||
+          requestOrigin.endsWith(".vercel.app") ||
+          requestOrigin.includes("localhost")
+        ) {
+          return callback(null, true);
+        }
+        return callback(null, true);
+      },
       credentials: true,
     }),
   );
@@ -26,12 +41,15 @@ export async function expressApplication(): Promise<Application> {
   expressApp.use(express.urlencoded({ extended: true, limit: "16kb" }));
   expressApp.use(cookieParser());
 
-  // Health check
-  expressApp.get("/", (_req, res) => {
-    return res.status(200).json({ Health: "Ok" });
+  expressApp.get(["/", "/health", "/api/health"], (_req, res) => {
+    return res.status(200).json({
+      status: "healthy",
+      service: "orbittrack-backend",
+      uptime: process.uptime(),
+      timestamp: new Date().toISOString(),
+    });
   });
 
-  // API Routes
   expressApp.use("/api/auth", authRoutes);
   expressApp.use("/api/clients", clientRoutes);
   expressApp.use("/api/projects", projectRoutes);
@@ -40,12 +58,10 @@ export async function expressApplication(): Promise<Application> {
   expressApp.use("/api/dashboard", dashboardRoutes);
   expressApp.use("/api/notifications", notificationRoutes);
 
-  // 404 Route handler
   expressApp.use((_req, _res, next) => {
     next(new ApiError(404, "Route Not Found"));
   });
 
-  // Global Error Handler
   expressApp.use(globalErrorHandler);
 
   return expressApp;
