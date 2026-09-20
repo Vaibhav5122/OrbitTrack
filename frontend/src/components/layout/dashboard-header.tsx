@@ -42,11 +42,13 @@ import {
 } from "@/components/ui/sheet";
 import { DashboardSidebarContent } from "./dashboard-sidebar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { useSocket } from "@/components/providers/socket-provider";
 
 export function DashboardHeader() {
   const router = useRouter();
   const pathname = usePathname();
   const { data: user } = useUser();
+  const { isConnected, activeUsersCount } = useSocket();
   const { mutate: logout, isPending: isLoggingOut } = useLogout();
   const { mutate: quickLogin, isPending: isSwitchingRole } = useLogin();
 
@@ -133,8 +135,16 @@ export function DashboardHeader() {
       <div className="flex items-center gap-2 sm:gap-3">
         {/* Live Presence Indicator */}
         <div className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card/60 px-2.5 py-0.5 text-[11px] font-mono text-muted-foreground shadow-xs">
-          <RiCircleFill className="size-2 text-emerald-500 animate-pulse" />
-          <span>Live Presence Online</span>
+          <RiCircleFill
+            className={`size-2 ${
+              isConnected ? "text-emerald-500 animate-pulse" : "text-amber-500"
+            }`}
+          />
+          <span>
+            {isConnected
+              ? `Presence: ${activeUsersCount} online`
+              : "Connecting..."}
+          </span>
         </div>
 
         {/* Evaluator Quick Role Switcher */}

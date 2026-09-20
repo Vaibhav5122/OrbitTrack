@@ -19,6 +19,7 @@ const geistMono = Geist_Mono({
 
 import { QueryProvider } from "@/components/providers/query-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { SocketProvider } from "@/components/providers/socket-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -41,10 +42,12 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <QueryProvider>
-            <TooltipProvider delayDuration={200}>
-              {children}
-              <Toaster richColors position="top-right" />
-            </TooltipProvider>
+            <SocketProvider>
+              <TooltipProvider delayDuration={200}>
+                {children}
+                <Toaster richColors position="top-right" />
+              </TooltipProvider>
+            </SocketProvider>
           </QueryProvider>
         </ThemeProvider>
       </body>

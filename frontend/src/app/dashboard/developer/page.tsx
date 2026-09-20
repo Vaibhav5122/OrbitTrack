@@ -14,6 +14,7 @@ import {
 } from "@remixicon/react";
 
 import { useDeveloperDashboard, useUpdateTaskStatus } from "@/lib/hooks/useDashboard";
+import { ActivityFeed } from "@/components/activity-feed";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -268,6 +269,13 @@ export default function DeveloperDashboardPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Developer Scoped Activity Feed */}
+      <ActivityFeed
+        limit={10}
+        title="Assigned Tasks Activity Stream"
+        description="Live real-time events and updates on tasks assigned to your development queue."
+      />
     </div>
   );
 }

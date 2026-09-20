@@ -14,6 +14,7 @@ import {
 } from "@remixicon/react";
 
 import { usePmDashboard } from "@/lib/hooks/useDashboard";
+import { ActivityFeed } from "@/components/activity-feed";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -267,6 +268,13 @@ export default function PmDashboardPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Managed Projects Activity Feed */}
+      <ActivityFeed
+        limit={12}
+        title="Project Team Activity Feed"
+        description="Real-time events from tasks and team member actions across your owned projects."
+      />
     </div>
   );
 }

@@ -16,6 +16,8 @@ import {
 } from "@remixicon/react";
 
 import { useAdminDashboard } from "@/lib/hooks/useDashboard";
+import { useSocket } from "@/components/providers/socket-provider";
+import { ActivityFeed } from "@/components/activity-feed";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,6 +26,7 @@ import { OrbitLoader } from "@/components/ui/orbit-loader";
 
 export default function AdminDashboardPage() {
   const { data, isLoading, error, refetch } = useAdminDashboard();
+  const { activeUsersCount: liveActiveUsers } = useSocket();
 
   if (isLoading) {
     return (
@@ -171,7 +174,7 @@ export default function AdminDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400">
-              {activeUsersCount}
+              {liveActiveUsers || activeUsersCount}
             </div>
             <p className="text-[11px] text-muted-foreground mt-1">
               WebSocket clients connected
@@ -296,6 +299,13 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Global Real-Time Activity Feed */}
+      <ActivityFeed
+        limit={15}
+        title="Global Platform Live Activity Stream"
+        description="Live audit events streamed via WebSocket rooms across all client projects and team tasks."
+      />
     </div>
   );
 }
