@@ -18,6 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 import { QueryProvider } from "@/components/providers/query-provider";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -34,15 +35,18 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-mono", jetbrainsMono.variable, merriweatherHeading.variable)}
     >
       <body className="min-h-full flex flex-col">
-        <QueryProvider>
-          <TooltipProvider delayDuration={200}>
-            {children}
-            <Toaster richColors position="top-right" />
-          </TooltipProvider>
-        </QueryProvider>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+          <QueryProvider>
+            <TooltipProvider delayDuration={200}>
+              {children}
+              <Toaster richColors position="top-right" />
+            </TooltipProvider>
+          </QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

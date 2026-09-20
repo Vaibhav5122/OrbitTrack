@@ -10,6 +10,7 @@ import {
 } from "@remixicon/react";
 import { Button } from "@/components/ui/button";
 import { OrbitLoader } from "@/components/ui/orbit-loader";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function Home() {
   return (
@@ -32,6 +33,7 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-2.5 sm:gap-4">
+            <ThemeToggle />
             <Link href="/login">
               <Button variant="ghost" size="sm" className="text-xs font-medium">
                 Sign In

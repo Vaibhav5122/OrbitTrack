@@ -41,6 +41,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { DashboardSidebarContent } from "./dashboard-sidebar";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export function DashboardHeader() {
   const router = useRouter();
@@ -205,6 +206,9 @@ export function DashboardHeader() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        {/* Theme Toggle (Black & White Dark/Light) */}
+        <ThemeToggle />
 
         {/* Notifications Dropdown */}
         <DropdownMenu>
