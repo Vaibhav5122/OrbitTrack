@@ -51,7 +51,6 @@ export default function ActivityPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
@@ -68,7 +67,6 @@ export default function ActivityPage() {
         </div>
       </div>
 
-      {/* Scope Info Card */}
       <Card className="border-border/60 bg-card/40">
         <CardContent className="p-4 flex items-start gap-3">
           <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary shrink-0">
@@ -85,7 +83,6 @@ export default function ActivityPage() {
         </CardContent>
       </Card>
 
-      {/* Full Activity Feed Component */}
       <ActivityFeed
         limit={50}
         title="Live Real-Time Activity Feed"

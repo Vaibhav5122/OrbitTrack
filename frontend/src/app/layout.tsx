@@ -20,6 +20,7 @@ const geistMono = Geist_Mono({
 import { QueryProvider } from "@/components/providers/query-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { SocketProvider } from "@/components/providers/socket-provider";
+import { BackendWarmup } from "@/components/providers/backend-warmup";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -40,6 +41,7 @@ export default function RootLayout({
       className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-mono", jetbrainsMono.variable, merriweatherHeading.variable)}
     >
       <body className="min-h-full flex flex-col">
+        <BackendWarmup />
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <QueryProvider>
             <SocketProvider>

@@ -75,7 +75,6 @@ export default function ProjectsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
@@ -172,7 +171,6 @@ export default function ProjectsPage() {
         )}
       </div>
 
-      {/* Projects Grid */}
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
@@ -236,11 +234,17 @@ export default function ProjectsPage() {
                   </div>
                 </div>
 
-                <div className="pt-1">
-                  <Link href={`/dashboard/tasks?projectId=${project.id}`}>
-                    <Button variant="outline" className="w-full h-9 text-xs gap-1.5 font-medium">
-                      <span>View Tasks in Kanban</span>
+                <div className="pt-1 flex items-center gap-2">
+                  <Link href={`/dashboard/projects/${project.id}`} className="flex-1">
+                    <Button variant="outline" className="w-full h-9 text-xs gap-1 font-medium">
+                      <span>Details</span>
                       <RiArrowRightLine className="size-3.5" />
+                    </Button>
+                  </Link>
+                  <Link href={`/dashboard/tasks?projectId=${project.id}`} className="flex-1">
+                    <Button className="w-full h-9 text-xs gap-1 font-medium">
+                      <span>Kanban</span>
+                      <RiTaskLine className="size-3.5" />
                     </Button>
                   </Link>
                 </div>

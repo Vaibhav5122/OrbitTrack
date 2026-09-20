@@ -96,7 +96,6 @@ export default function DeveloperDashboardPage() {
 
   return (
     <div className="space-y-8">
-      {/* Top Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
@@ -111,7 +110,6 @@ export default function DeveloperDashboardPage() {
         </div>
       </div>
 
-      {/* KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         <Card className="shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
@@ -172,7 +170,6 @@ export default function DeveloperDashboardPage() {
         </Card>
       </div>
 
-      {/* Assigned Tasks List */}
       <Card className="shadow-xs">
         <CardHeader>
           <CardTitle className="text-base font-semibold">Assigned Tasks ({tasks.length})</CardTitle>
@@ -224,7 +221,6 @@ export default function DeveloperDashboardPage() {
                     </div>
                   </div>
 
-                  {/* RBAC Action Controls */}
                   <div className="flex items-center gap-2 shrink-0">
                     {task.status === "TODO" && (
                       <Button
@@ -270,7 +266,6 @@ export default function DeveloperDashboardPage() {
         </CardContent>
       </Card>
 
-      {/* Developer Scoped Activity Feed */}
       <ActivityFeed
         limit={10}
         title="Assigned Tasks Activity Stream"

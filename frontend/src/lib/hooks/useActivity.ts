@@ -57,7 +57,6 @@ export function useActivityFeed(limit = 20) {
       queryClient.setQueryData<ActivityItem[]>(
         ["activities", "feed", limit],
         (old = []) => {
-          // Check if already exists
           if (old.some((item) => item.id === incomingItem.id)) {
             return old;
           }

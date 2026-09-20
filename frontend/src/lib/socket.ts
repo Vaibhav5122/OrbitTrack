@@ -79,15 +79,12 @@ export function initSocket(customToken?: string): Socket {
   });
 
   socketInstance.on("connect", () => {
-    // Socket connected
   });
 
   socketInstance.on("connect_error", () => {
-    // Socket connection error
   });
 
   socketInstance.on("disconnect", () => {
-    // Socket disconnected
   });
 
   return socketInstance;

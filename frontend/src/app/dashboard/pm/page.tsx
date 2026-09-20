@@ -60,7 +60,6 @@ export default function PmDashboardPage() {
 
   return (
     <div className="space-y-8">
-      {/* Top Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
@@ -84,7 +83,6 @@ export default function PmDashboardPage() {
         </div>
       </div>
 
-      {/* Priority Metrics Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         <Card className="shadow-xs border-destructive/30 bg-destructive/5">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
@@ -143,7 +141,6 @@ export default function PmDashboardPage() {
         </Card>
       </div>
 
-      {/* Owned Projects Grid */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
@@ -207,7 +204,6 @@ export default function PmDashboardPage() {
         </div>
       </div>
 
-      {/* Upcoming Deadlines This Week */}
       <Card className="shadow-xs">
         <CardHeader>
           <CardTitle className="text-base font-semibold flex items-center gap-2">
@@ -269,7 +265,6 @@ export default function PmDashboardPage() {
         </CardContent>
       </Card>
 
-      {/* Managed Projects Activity Feed */}
       <ActivityFeed
         limit={12}
         title="Project Team Activity Feed"

@@ -72,7 +72,6 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="space-y-8">
-      {/* Top Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
@@ -102,9 +101,7 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* Primary KPI Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Total Projects */}
         <Card className="shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-medium text-muted-foreground uppercase font-mono tracking-wider">
@@ -122,7 +119,6 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Total Team Members */}
         <Card className="shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-medium text-muted-foreground uppercase font-mono tracking-wider">
@@ -140,7 +136,6 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Overdue Tasks Alert */}
         <Card className={`shadow-xs ${overdueTaskCount > 0 ? "border-destructive/40 bg-destructive/5" : ""}`}>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-medium text-muted-foreground uppercase font-mono tracking-wider">
@@ -162,7 +157,6 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Live Active Presence */}
         <Card className="shadow-xs border-emerald-500/30 bg-emerald-500/5">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-medium text-muted-foreground uppercase font-mono tracking-wider">
@@ -183,9 +177,7 @@ export default function AdminDashboardPage() {
         </Card>
       </div>
 
-      {/* Task Distribution & Architectural Guarantees */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Status Distribution */}
         <Card className="lg:col-span-2 shadow-xs">
           <CardHeader>
             <CardTitle className="text-base font-semibold">Task Status Distribution</CardTitle>
@@ -194,7 +186,6 @@ export default function AdminDashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Visual Progress Bar */}
             <div className="flex h-3 w-full overflow-hidden rounded-full bg-secondary">
               <div
                 style={{ width: `${totalTasks > 0 ? (tasksByStatus.DONE / totalTasks) * 100 : 0}%` }}
@@ -218,7 +209,6 @@ export default function AdminDashboardPage() {
               />
             </div>
 
-            {/* Status Breakdown Pills */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="rounded-lg border border-border/60 p-3 space-y-1">
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -255,7 +245,6 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Architecture & Assessment Verification Checklist */}
         <Card className="shadow-xs bg-secondary/20">
           <CardHeader>
             <CardTitle className="text-base font-semibold flex items-center gap-2">
@@ -300,7 +289,6 @@ export default function AdminDashboardPage() {
         </Card>
       </div>
 
-      {/* Global Real-Time Activity Feed */}
       <ActivityFeed
         limit={15}
         title="Global Platform Live Activity Stream"

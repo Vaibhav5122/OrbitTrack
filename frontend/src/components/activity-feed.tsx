@@ -139,7 +139,6 @@ export function ActivityFeed({
               <CardTitle className="font-heading text-base font-bold tracking-tight">
                 {title}
               </CardTitle>
-              {/* Real-time Socket status indicator */}
               <span
                 className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-mono font-medium border ${
                   isConnected

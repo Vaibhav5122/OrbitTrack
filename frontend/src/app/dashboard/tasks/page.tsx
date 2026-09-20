@@ -17,6 +17,7 @@ import {
 } from "@remixicon/react";
 
 import { useUser } from "@/lib/hooks/useAuth";
+import { toast } from "sonner";
 import {
   useTasks,
   useCreateTask,
@@ -73,12 +74,30 @@ function KanbanBoardContent() {
 
   const selectedProjectId = searchParams.get("projectId") || "";
   const selectedPriority = (searchParams.get("priority") as TaskPriority) || "";
+  const selectedStatus = (searchParams.get("status") as TaskStatus) || "";
+  const selectedDateRange = searchParams.get("dueDateRange") || "";
   const isOverdueOnly = searchParams.get("isOverdue") === "true";
+
+  const dueDateRangeFilter = useMemo(() => {
+    if (selectedDateRange === "TODAY") {
+      const endOfDay = new Date();
+      endOfDay.setHours(23, 59, 59, 999);
+      return { dueDateTo: endOfDay.toISOString() };
+    }
+    if (selectedDateRange === "THIS_WEEK") {
+      const endOfWeek = new Date();
+      endOfWeek.setDate(endOfWeek.getDate() + 7);
+      return { dueDateTo: endOfWeek.toISOString() };
+    }
+    return {};
+  }, [selectedDateRange]);
 
   const { data: tasks = [], isLoading, error } = useTasks({
     projectId: selectedProjectId || undefined,
     priority: selectedPriority || undefined,
+    status: selectedStatus || undefined,
     isOverdue: isOverdueOnly ? true : undefined,
+    ...dueDateRangeFilter,
   });
 
   const { data: projects = [] } = useProjects();
@@ -87,7 +106,6 @@ function KanbanBoardContent() {
   const { mutate: removeTask } = useDeleteTask();
   const { mutate: createNewTask, isPending: isCreatingTask } = useCreateTask();
 
-  // Create Task modal state
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
@@ -96,7 +114,44 @@ function KanbanBoardContent() {
   const [taskDueDate, setTaskDueDate] = useState("");
   const [taskAssignee, setTaskAssignee] = useState("");
 
+  const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
+  const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
+
   const isManagerOrAdmin = user?.role === "ADMIN" || user?.role === "PROJECT_MANAGER";
+
+  const handleDropOnColumn = (targetStatus: TaskStatus) => {
+    if (!draggedTaskId) return;
+    const task = tasks.find((t) => t.id === draggedTaskId);
+    if (!task) return;
+
+    if (task.status === targetStatus) {
+      setDraggedTaskId(null);
+      setDragOverColumn(null);
+      return;
+    }
+
+    if (user?.role === "DEVELOPER" && targetStatus === "DONE") {
+      toast.error("Action Prohibited", {
+        description: "Only Project Managers and Admins can approve tasks to Done.",
+      });
+      setDraggedTaskId(null);
+      setDragOverColumn(null);
+      return;
+    }
+
+    if (user?.role === "DEVELOPER" && task.assignedToId !== user.id) {
+      toast.error("Action Prohibited", {
+        description: "You can only update status on tasks assigned to you.",
+      });
+      setDraggedTaskId(null);
+      setDragOverColumn(null);
+      return;
+    }
+
+    changeStatus({ id: task.id, status: targetStatus });
+    setDraggedTaskId(null);
+    setDragOverColumn(null);
+  };
 
   const updateFilters = (key: string, value: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -140,7 +195,6 @@ function KanbanBoardContent() {
     );
   };
 
-  // Group tasks by status
   const tasksByColumn = useMemo(() => {
     const grouped: Record<TaskStatus, Task[]> = {
       TODO: [],
@@ -182,7 +236,6 @@ function KanbanBoardContent() {
 
   return (
     <div className="space-y-6">
-      {/* Header & Create Task Action */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
@@ -334,14 +387,12 @@ function KanbanBoardContent() {
         )}
       </div>
 
-      {/* Filter Bar (Synchronized with URL params) */}
       <div className="flex flex-wrap items-center gap-2.5 rounded-xl border border-border/60 bg-card p-3 shadow-2xs">
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground mr-1">
           <RiFilter3Line className="size-4 text-primary" />
           <span className="font-medium">Filters:</span>
         </div>
 
-        {/* Project Selector Filter */}
         <Select
           value={selectedProjectId || "ALL"}
           onValueChange={(val) => updateFilters("projectId", val === "ALL" ? null : val)}
@@ -359,7 +410,6 @@ function KanbanBoardContent() {
           </SelectContent>
         </Select>
 
-        {/* Priority Filter */}
         <Select
           value={selectedPriority || "ALL"}
           onValueChange={(val) => updateFilters("priority", val === "ALL" ? null : val)}
@@ -376,7 +426,36 @@ function KanbanBoardContent() {
           </SelectContent>
         </Select>
 
-        {/* Overdue Toggle */}
+        <Select
+          value={selectedStatus || "ALL"}
+          onValueChange={(val) => updateFilters("status", val === "ALL" ? null : val)}
+        >
+          <SelectTrigger className="h-8 w-36 text-xs font-mono">
+            <SelectValue placeholder="All Statuses" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL" className="text-xs font-mono">All Statuses</SelectItem>
+            <SelectItem value="TODO" className="text-xs font-mono">To Do</SelectItem>
+            <SelectItem value="IN_PROGRESS" className="text-xs font-mono">In Progress</SelectItem>
+            <SelectItem value="IN_REVIEW" className="text-xs font-mono">In Review</SelectItem>
+            <SelectItem value="DONE" className="text-xs font-mono">Done</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select
+          value={selectedDateRange || "ALL"}
+          onValueChange={(val) => updateFilters("dueDateRange", val === "ALL" ? null : val)}
+        >
+          <SelectTrigger className="h-8 w-36 text-xs font-mono">
+            <SelectValue placeholder="Due Date" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL" className="text-xs font-mono">All Dates</SelectItem>
+            <SelectItem value="TODAY" className="text-xs font-mono">Due Today</SelectItem>
+            <SelectItem value="THIS_WEEK" className="text-xs font-mono">Due This Week</SelectItem>
+          </SelectContent>
+        </Select>
+
         <Button
           variant={isOverdueOnly ? "destructive" : "outline"}
           size="sm"
@@ -387,8 +466,7 @@ function KanbanBoardContent() {
           <span>Overdue Only</span>
         </Button>
 
-        {/* Clear Filters */}
-        {(selectedProjectId || selectedPriority || isOverdueOnly) && (
+        {(selectedProjectId || selectedPriority || selectedStatus || selectedDateRange || isOverdueOnly) && (
           <Button
             variant="ghost"
             size="sm"
@@ -401,7 +479,6 @@ function KanbanBoardContent() {
         )}
       </div>
 
-      {/* Kanban Columns Grid */}
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((col) => (
@@ -423,9 +500,24 @@ function KanbanBoardContent() {
             return (
               <div
                 key={column.id}
-                className="flex flex-col rounded-xl border border-border/60 bg-secondary/30 p-3 shadow-2xs"
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.dataTransfer.dropEffect = "move";
+                  if (dragOverColumn !== column.id) setDragOverColumn(column.id);
+                }}
+                onDragLeave={() => {
+                  setDragOverColumn((prev) => (prev === column.id ? null : prev));
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  handleDropOnColumn(column.id);
+                }}
+                className={`flex flex-col rounded-xl border transition-all p-3 shadow-2xs ${
+                  dragOverColumn === column.id
+                    ? "border-primary/80 ring-2 ring-primary/40 bg-primary/5"
+                    : "border-border/60 bg-secondary/30"
+                }`}
               >
-                {/* Column Header */}
                 <div className="flex items-center justify-between pb-3 border-b border-border/50">
                   <div className="flex items-center gap-2">
                     <span className={`size-2.5 rounded-full ${column.dotColor}`} />
@@ -438,7 +530,6 @@ function KanbanBoardContent() {
                   </Badge>
                 </div>
 
-                {/* Cards Container */}
                 <div className="flex flex-col gap-2.5 pt-3 min-h-[350px]">
                   {columnTasks.length === 0 ? (
                     <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed border-border/60 p-4 text-center text-[11px] text-muted-foreground">
@@ -448,12 +539,24 @@ function KanbanBoardContent() {
                     columnTasks.map((task) => (
                       <Card
                         key={task.id}
-                        className={`shadow-xs transition-all hover:border-primary/50 hover:shadow-sm ${
+                        draggable
+                        onDragStart={(e) => {
+                          e.dataTransfer.setData("text/plain", task.id);
+                          setDraggedTaskId(task.id);
+                        }}
+                        onDragEnd={() => {
+                          setDraggedTaskId(null);
+                          setDragOverColumn(null);
+                        }}
+                        className={`shadow-xs transition-all cursor-grab active:cursor-grabbing hover:border-primary/50 hover:shadow-sm ${
+                          draggedTaskId === task.id
+                            ? "opacity-40 scale-[0.98] border-dashed border-primary"
+                            : ""
+                        } ${
                           task.isOverdue ? "border-destructive/40 bg-destructive/5" : ""
                         }`}
                       >
                         <CardContent className="p-3 space-y-2.5">
-                          {/* Top row: Project & Priority badges */}
                           <div className="flex items-center justify-between gap-1.5">
                             <span className="text-[10px] font-mono text-muted-foreground truncate max-w-[120px]">
                               {task.project.name}
@@ -468,7 +571,6 @@ function KanbanBoardContent() {
                             </div>
                           </div>
 
-                          {/* Task Title */}
                           <h3 className="text-xs font-semibold text-foreground leading-snug">
                             {task.title}
                           </h3>
@@ -479,7 +581,6 @@ function KanbanBoardContent() {
                             </p>
                           )}
 
-                          {/* Bottom row: Assignee, Due date & Status transition menu */}
                           <div className="flex items-center justify-between border-t border-border/40 pt-2 text-[11px] text-muted-foreground">
                             <div className="flex items-center gap-1.5">
                               <Avatar className="size-5 border border-border/80">
@@ -500,7 +601,6 @@ function KanbanBoardContent() {
                                 })}
                               </span>
 
-                              {/* Status Transition Action Menu */}
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                   <button
@@ -519,7 +619,6 @@ function KanbanBoardContent() {
 
                                   {COLUMNS.map((c) => {
                                     const isCurrent = task.status === c.id;
-                                    // RBAC restriction: Developers cannot set DONE directly
                                     const isDevRestricted =
                                       user?.role === "DEVELOPER" && c.id === "DONE";
 

@@ -32,16 +32,12 @@ export function OrbitLoader({ size = "md", text, className }: OrbitLoaderProps) 
   const content = (
     <div className={cn("flex flex-col items-center justify-center gap-4", className)}>
       <div className="relative flex size-14 items-center justify-center">
-        {/* Outer Orbit Ring */}
         <div className="absolute inset-0 animate-[spin_3s_linear_infinite] rounded-full border-2 border-dashed border-primary/30" />
         
-        {/* Middle Pulse Ring */}
         <div className="absolute inset-1.5 animate-[spin_2s_linear_infinite_reverse] rounded-full border-2 border-primary/40 border-t-primary" />
         
-        {/* Inner Core */}
         <div className="size-4 animate-pulse rounded-full bg-primary shadow-[0_0_12px_rgba(var(--primary),0.6)]" />
 
-        {/* Orbiting Satellite Dot */}
         <div className="absolute -top-1 left-1/2 size-2.5 -translate-x-1/2 animate-[spin_1.5s_linear_infinite] rounded-full bg-primary shadow-sm" />
       </div>
 

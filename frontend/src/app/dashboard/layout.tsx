@@ -16,10 +16,8 @@ export default function DashboardLayout({
   return (
     <AuthGuard>
       <div className="min-h-screen bg-background text-foreground flex">
-        {/* Desktop Persistent Sidebar */}
         <DashboardSidebar />
 
-        {/* Main Content Area */}
         <div className="flex flex-1 flex-col md:pl-60 min-w-0">
           <DashboardHeader />
           <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>

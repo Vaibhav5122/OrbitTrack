@@ -120,7 +120,6 @@ export function DashboardSidebarContent() {
   return (
     <div className="flex h-full flex-col justify-between bg-card/70 border-r border-border/60">
       <div className="flex flex-col">
-        {/* Brand Logo Header */}
         <div className="flex h-14 items-center gap-2.5 border-b border-border/60 px-5">
           <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-xs shadow-primary/30">
             <RiRadarLine className="size-4 animate-pulse" />
@@ -135,7 +134,6 @@ export function DashboardSidebarContent() {
           </div>
         </div>
 
-        {/* Navigation Items */}
         <div className="p-3">
           <p className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
             Navigation
@@ -178,7 +176,6 @@ export function DashboardSidebarContent() {
         </div>
       </div>
 
-      {/* Role Footer Card */}
       <div className="p-3 border-t border-border/60">
         <div className="flex items-center gap-3 rounded-lg border border-border/50 bg-secondary/40 p-2.5">
           <div className="flex size-7 items-center justify-center rounded-md bg-primary/10 text-primary">

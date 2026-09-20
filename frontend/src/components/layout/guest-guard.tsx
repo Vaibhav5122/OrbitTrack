@@ -29,7 +29,6 @@ export function GuestGuard({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Prevent flash of login/signup content if user is already authenticated
   if (user) {
     return null;
   }

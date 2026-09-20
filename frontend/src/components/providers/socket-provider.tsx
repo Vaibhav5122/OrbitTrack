@@ -72,15 +72,12 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     const handleNewNotification = (data: NewNotificationEventPayload) => {
       const { notification, unreadCount } = data;
 
-      // Update TanStack query cache for unread count
       queryClient.setQueryData(["notifications", "unread-count"], {
         unreadCount,
       });
 
-      // Invalidate notifications query to fetch latest list on dropdown open
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
 
-      // Trigger interactive Sonner notification
       toast(notification.title, {
         description: notification.message,
         duration: 5000,
@@ -96,11 +93,9 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     };
 
     const handleTaskStatusUpdated = (payload: TaskStatusUpdatedPayload) => {
-      // Invalidate task queries so Kanban board updates automatically across clients
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
 
-      // Notify if this status change was made by someone else
       if (payload.updatedById !== user.id) {
         toast.info("Task Board Updated", {
           description: `${payload.updatedByName} updated task status to ${payload.status.replace("_", " ")}`,
@@ -123,7 +118,6 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     s.on("task:status_updated", handleTaskStatusUpdated);
     s.on("activity:new", handleActivityLog);
 
-    // Initial check
     if (!s.connected) {
       s.connect();
     }

@@ -96,7 +96,6 @@ export function DashboardHeader() {
   return (
     <header className="sticky top-0 z-30 flex h-14 w-full items-center justify-between border-b border-border/60 bg-background/80 px-4 backdrop-blur-md sm:px-6">
       <div className="flex items-center gap-3">
-        {/* Mobile Navigation Sheet Trigger */}
         <Sheet>
           <SheetTrigger asChild>
             <Button
@@ -116,7 +115,6 @@ export function DashboardHeader() {
           </SheetContent>
         </Sheet>
 
-        {/* Current Area Breadcrumb */}
         <div className="hidden items-center gap-2 text-xs text-muted-foreground sm:flex">
           <Link
             href="/dashboard"
@@ -133,7 +131,6 @@ export function DashboardHeader() {
       </div>
 
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* Live Presence Indicator */}
         <div className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card/60 px-2.5 py-0.5 text-[11px] font-mono text-muted-foreground shadow-xs">
           <RiCircleFill
             className={`size-2 ${
@@ -147,7 +144,6 @@ export function DashboardHeader() {
           </span>
         </div>
 
-        {/* Evaluator Quick Role Switcher */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -217,10 +213,8 @@ export function DashboardHeader() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Theme Toggle (Black & White Dark/Light) */}
         <ThemeToggle />
 
-        {/* Notifications Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -288,7 +282,6 @@ export function DashboardHeader() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* User Profile Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button

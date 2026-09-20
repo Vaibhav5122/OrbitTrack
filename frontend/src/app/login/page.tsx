@@ -13,18 +13,15 @@ export default function LoginPage() {
   return (
     <GuestGuard>
       <div className="relative flex min-h-svh flex-col items-center justify-center bg-background px-4 py-8 sm:px-6 lg:px-8">
-        {/* Top-right Theme Toggle */}
         <div className="absolute top-4 right-4 z-20">
           <ThemeToggle />
         </div>
 
-        {/* Subtle background ambient glow */}
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden">
           <div className="size-[500px] rounded-full bg-primary/5 blur-3xl" />
         </div>
 
         <div className="relative z-10 w-full max-w-sm sm:max-w-md space-y-6">
-          {/* Brand Header */}
           <Link
             href="/"
             className="group flex items-center justify-center gap-2.5 transition-transform hover:scale-[1.02]"
