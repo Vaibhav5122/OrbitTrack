@@ -75,7 +75,7 @@ export default function PmDashboardPage() {
 
         <div className="flex items-center gap-2">
           <Link href="/dashboard/tasks">
-            <Button size="sm" className="text-xs gap-1.5 shadow-xs shadow-primary/20">
+            <Button className="h-9 px-4 text-xs font-medium gap-1.5 shadow-xs shadow-primary/20">
               <RiTaskLine className="size-3.5" />
               Review Tasks & Kanban
             </Button>

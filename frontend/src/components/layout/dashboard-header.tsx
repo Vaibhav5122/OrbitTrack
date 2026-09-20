@@ -142,10 +142,10 @@ export function DashboardHeader() {
             <Button
               variant="outline"
               size="sm"
-              className="h-8 gap-1.5 text-xs font-mono border-primary/30 bg-primary/5 hover:bg-primary/10"
+              className="h-9 px-3 gap-2 text-xs font-mono border-primary/30 bg-primary/5 hover:bg-primary/10 shadow-xs"
               disabled={isSwitchingRole}
             >
-              <RiExchangeLine className="size-3.5 text-primary" />
+              <RiExchangeLine className="size-4 text-primary" />
               <span className="hidden md:inline">Evaluator Switch:</span>
               <span className="font-semibold text-primary">
                 {user?.role === "ADMIN"
@@ -156,51 +156,51 @@ export function DashboardHeader() {
               </span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
+          <DropdownMenuContent align="end" className="w-64 p-2">
+            <DropdownMenuLabel className="text-xs font-mono uppercase tracking-wider text-muted-foreground pb-1.5">
               Instant RBAC Role Switch
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
+            <DropdownMenuSeparator className="my-1" />
             <DropdownMenuItem
               onClick={() =>
                 handleQuickSwitch("vaibhav.admin@orbittrack.com", "/dashboard/admin")
               }
-              className="cursor-pointer gap-2"
+              className="cursor-pointer gap-2.5 py-2"
             >
-              <Badge className="text-[10px] bg-primary text-primary-foreground">
+              <Badge className="text-xs px-2 py-0.5 bg-primary text-primary-foreground font-mono font-bold">
                 ADMIN
               </Badge>
               <div className="flex flex-col">
-                <span className="text-xs font-medium">Vaibhav Waghmode</span>
-                <span className="text-[10px] text-muted-foreground">Full Platform Oversight</span>
+                <span className="text-sm font-semibold text-foreground">Vaibhav Waghmode</span>
+                <span className="text-xs text-muted-foreground">Full Platform Oversight</span>
               </div>
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() =>
                 handleQuickSwitch("siddhesh.pm@orbittrack.com", "/dashboard/pm")
               }
-              className="cursor-pointer gap-2"
+              className="cursor-pointer gap-2.5 py-2"
             >
-              <Badge variant="secondary" className="text-[10px]">
+              <Badge variant="secondary" className="text-xs px-2 py-0.5 font-mono font-bold">
                 PM
               </Badge>
               <div className="flex flex-col">
-                <span className="text-xs font-medium">Siddhesh Kadam</span>
-                <span className="text-[10px] text-muted-foreground">Project Management</span>
+                <span className="text-sm font-semibold text-foreground">Siddhesh Kadam</span>
+                <span className="text-xs text-muted-foreground">Project Management</span>
               </div>
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() =>
                 handleQuickSwitch("omkar.dev@orbittrack.com", "/dashboard/developer")
               }
-              className="cursor-pointer gap-2"
+              className="cursor-pointer gap-2.5 py-2"
             >
-              <Badge variant="outline" className="text-[10px]">
+              <Badge variant="outline" className="text-xs px-2 py-0.5 font-mono font-bold">
                 DEV
               </Badge>
               <div className="flex flex-col">
-                <span className="text-xs font-medium">Omkar Shinde</span>
-                <span className="text-[10px] text-muted-foreground">Assigned Tasks Only</span>
+                <span className="text-sm font-semibold text-foreground">Omkar Shinde</span>
+                <span className="text-xs text-muted-foreground">Assigned Tasks Only</span>
               </div>
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -212,10 +212,10 @@ export function DashboardHeader() {
             <Button
               variant="ghost"
               size="icon"
-              className="relative size-8"
+              className="relative size-9"
               aria-label="Notifications"
             >
-              <RiNotification3Line className="size-4" />
+              <RiNotification3Line className="size-4.5" />
               {unreadCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
                   {unreadCount > 9 ? "9+" : unreadCount}
@@ -279,35 +279,47 @@ export function DashboardHeader() {
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="flex items-center gap-2 p-1.5 h-8 hover:bg-accent rounded-full"
+              className="flex items-center justify-center p-0.5 size-9 hover:bg-accent rounded-full"
             >
-              <Avatar className="size-7 border border-border/80">
-                <AvatarFallback className="text-[11px] font-bold bg-primary/10 text-primary">
+              <Avatar className="size-8 border border-border/80">
+                <AvatarFallback className="text-xs font-bold bg-primary/10 text-primary">
                   {getInitials(user?.name)}
                 </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel className="flex flex-col gap-1">
-              <span className="text-xs font-semibold">{user?.name}</span>
-              <span className="text-[11px] text-muted-foreground font-mono truncate">
-                {user?.email}
-              </span>
-              <div className="pt-1">
+          <DropdownMenuContent align="end" className="w-64 p-2.5">
+            <DropdownMenuLabel className="p-0 font-normal">
+              <div className="flex items-center gap-3 pb-2 border-b border-border/50">
+                <Avatar className="size-10 border border-border/80">
+                  <AvatarFallback className="text-sm font-bold bg-primary/10 text-primary">
+                    {getInitials(user?.name)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col overflow-hidden">
+                  <span className="text-sm font-semibold text-foreground truncate">
+                    {user?.name}
+                  </span>
+                  <span className="text-xs text-muted-foreground font-mono truncate">
+                    {user?.email}
+                  </span>
+                </div>
+              </div>
+              <div className="pt-2 flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Active Role:</span>
                 <Badge
                   variant={getRoleBadgeVariant(user?.role)}
-                  className="text-[10px]"
+                  className="text-xs px-2.5 py-0.5 font-mono font-bold"
                 >
                   {user?.role?.replace("_", " ")}
                 </Badge>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
+            <DropdownMenuSeparator className="my-2" />
             <DropdownMenuItem
               onClick={() => logout()}
               disabled={isLoggingOut}
-              className="text-destructive focus:text-destructive cursor-pointer gap-2"
+              className="text-destructive focus:text-destructive cursor-pointer gap-2 py-2 text-sm font-medium"
             >
               <RiLogoutBoxRLine className="size-4" />
               <span>{isLoggingOut ? "Logging out..." : "Log out"}</span>

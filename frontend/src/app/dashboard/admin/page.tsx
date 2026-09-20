@@ -85,13 +85,13 @@ export default function AdminDashboardPage() {
 
         <div className="flex items-center gap-2">
           <Link href="/dashboard/tasks">
-            <Button size="sm" variant="outline" className="text-xs gap-1.5">
+            <Button variant="outline" className="h-9 px-3.5 text-xs font-medium gap-1.5">
               Kanban Board
               <RiArrowRightLine className="size-3.5" />
             </Button>
           </Link>
           <Link href="/dashboard/projects">
-            <Button size="sm" className="text-xs gap-1.5 shadow-xs shadow-primary/20">
+            <Button className="h-9 px-3.5 text-xs font-medium gap-1.5 shadow-xs shadow-primary/20">
               Manage Projects
               <RiArrowRightLine className="size-3.5" />
             </Button>

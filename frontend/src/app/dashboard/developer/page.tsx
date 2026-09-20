@@ -227,25 +227,23 @@ export default function DeveloperDashboardPage() {
                   <div className="flex items-center gap-2 shrink-0">
                     {task.status === "TODO" && (
                       <Button
-                        size="sm"
                         onClick={() => handleStatusTransition(task.id, "TODO")}
                         disabled={isUpdating}
-                        className="text-xs gap-1 h-8"
+                        className="text-xs gap-1.5 h-9 px-3.5 font-medium cursor-pointer shadow-xs"
                       >
-                        <RiPlayCircleLine className="size-3.5" />
+                        <RiPlayCircleLine className="size-4" />
                         Start Working
                       </Button>
                     )}
 
                     {task.status === "IN_PROGRESS" && (
                       <Button
-                        size="sm"
                         variant="secondary"
                         onClick={() => handleStatusTransition(task.id, "IN_PROGRESS")}
                         disabled={isUpdating}
-                        className="text-xs gap-1 h-8"
+                        className="text-xs gap-1.5 h-9 px-3.5 font-medium cursor-pointer shadow-xs"
                       >
-                        <RiSendPlaneLine className="size-3.5" />
+                        <RiSendPlaneLine className="size-4" />
                         Submit for Review
                       </Button>
                     )}
