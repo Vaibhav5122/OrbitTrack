@@ -27,5 +27,6 @@ authRouter.post("/refresh", authController.handleRefreshToken.bind(authControlle
 authRouter.post("/logout", authController.handleLogout.bind(authController));
 
 authRouter.get("/me", authenticateJwt, authController.handleGetMe.bind(authController));
+authRouter.get("/team", authenticateJwt, authController.handleGetTeam.bind(authController));
 
 export const authRoutes: Router = authRouter;

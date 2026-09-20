@@ -15,7 +15,9 @@ export const registerUserSchema = z.object({
   email: z
     .email({
       error: (issue) =>
-        issue.input === undefined ? "Email is required" : "Invalid text format",
+        issue.input === undefined
+          ? "Email address is required"
+          : "Please enter a valid email address with an '@' and domain (e.g. name@orbittrack.com)",
     })
     .trim()
     .max(322, "Email is too long")

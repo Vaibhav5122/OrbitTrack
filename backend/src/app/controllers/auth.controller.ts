@@ -256,4 +256,18 @@ export class AuthController {
 
     return ApiResponse.ok(res, "Current user profile fetched", user);
   }
+
+  public async handleGetTeam(_req: Request, res: Response) {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+      },
+      orderBy: { name: "asc" },
+    });
+
+    return ApiResponse.ok(res, "Team members fetched successfully", users);
+  }
 }

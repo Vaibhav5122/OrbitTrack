@@ -12,7 +12,9 @@ export const createClientSchema = z.object({
   email: z
     .email({
       error: (issue) =>
-        issue.input === undefined ? "Email is required" : "Invalid email format",
+        issue.input === undefined
+          ? "Email is required"
+          : "Please enter a valid email address with an '@' and domain (e.g. client@company.com)",
     })
     .trim()
     .toLowerCase(),
